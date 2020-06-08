@@ -1,6 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Home from './components/Home'
 interface State{
   apiResponse:string,
   dbResponse:string
@@ -25,19 +24,18 @@ class App extends React.Component<Props,State> {
         // .catch(err => err);
 }
   componentDidMount() {
-    this.callAPI();
+    // this.callAPI();
     this.callDB();
   }
   render() {
     console.log(this.state)
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+        {/* <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" /> */}
           {/* <p className="App-intro">{this.state.apiResponse}</p> */}
-          <p className="App-intro">{this.state.dbResponse}</p>
-
-        </header>
+          <Home/>
+        {/* </header> */}
       </div>
     );
   }
