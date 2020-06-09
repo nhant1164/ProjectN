@@ -1,40 +1,41 @@
 import React from 'react';
 import Home from './components/Home'
-interface State{
-  apiResponse:string,
-  dbResponse:string
+import Login from "./components/Login/Login";
+import Register from "./components/Register/register"
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import AuthService from "./services/auth.service";
+interface State {
+  loggedIn: boolean,
 }
-interface Props{
+interface Props {
 }
-class App extends React.Component<Props,State> {
-  constructor(props:Props) {
+class App extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = {dbResponse:"",
-    apiResponse: "" };
+    this.logOut = this.logOut.bind(this);
+    this.state = {
+      loggedIn: false
+    }
   }
-  callAPI() {
-    fetch("http://localhost:9000/testAPI")
-      .then(res => res.text())
-      .then(res => this.setState({ apiResponse: res }));
+  logOut() {
+    AuthService.logout();
   }
-  callDB() {
-    fetch("http://localhost:9000/testDB")
-        .then(res => res.text())
-        .then(res => this.setState({ dbResponse: res }))
-        // .catch(err => err);
-}
-  componentDidMount() {
-    // this.callAPI();
-    this.callDB();
-  }
+  // componentDidMount() {
+  //   const user = AuthService.getCurrentUser();
+  //   if(user)
+  //     this.setState(lo)
+  // }
   render() {
-    console.log(this.state)
     return (
       <div className="App">
+        <Switch>
+          <Route exact path={["/", "/home"]} component={Home} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/register" component={Register} />
+        </Switch>
         {/* <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" /> */}
-          {/* <p className="App-intro">{this.state.apiResponse}</p> */}
-          <Home/>
+        {/* <Home loggedIn={this.state.loggedIn} /> */}
         {/* </header> */}
       </div>
     );
