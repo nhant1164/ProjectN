@@ -12,25 +12,21 @@ interface Props {
 class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.logOut = this.logOut.bind(this);
     this.state = {
-      loggedIn: false
+      loggedIn: AuthService.getCurrentUser()
     }
   }
-  logOut() {
-    AuthService.logout();
+  logOut= ()=> {
+    this.setState({loggedIn:false},()=>AuthService.logout())
   }
-  // componentDidMount() {
-  //   const user = AuthService.getCurrentUser();
-  //   if(user)
-  //     this.setState(lo)
-  // }
   render() {
     return (
       <div className="App">
+       
+        {/* <p>Work in progress.</p> */}
         <Switch>
-          <Route exact path={["/", "/home"]} component={Home} />
-          <Route exact path="/login" component={Login} />
+          <Route exact path={["/", "/home"]}><Home  logOut={this.logOut} loggedIn={this.state.loggedIn} /></Route>
+          <Route exact path="/login" ><Login/></Route>
           <Route exact path="/register" component={Register} />
         </Switch>
         {/* <header className="App-header">

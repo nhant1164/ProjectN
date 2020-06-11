@@ -1,149 +1,91 @@
-import React, { Component, createRef } from "react";
-import Form from "react-validation/build/form";
-import Input from "react-validation/build/input";
-import CheckButton from "react-validation/build/button";
-
+import React, { Component, SyntheticEvent } from "react";
+import { withRouter  } from 'react-router-dom';
 import AuthService from "../../services/auth.service";
-const required = (value: string) => {
-    if (!value) {
-        return (
-            <div className="alert alert-danger" role="alert">
-                This field is required!
-            </div>
-        );
-    }
-};
-
-export default class Login extends Component<any, any> {
-    private checkBtn: any = createRef()
-    private form = createRef()
+ class Login extends Component<any, any> {
+    private inputPW: HTMLInputElement | null;
+    private inputUser: HTMLInputElement | null;
     constructor(props: any) {
         super(props);
-        this.handleLogin = this.handleLogin.bind(this);
-        this.onChangeUsername = this.onChangeUsername.bind(this);
-        this.onChangePassword = this.onChangePassword.bind(this);
-
         this.state = {
-            username: "",
-            password: "",
+            message: '',
             loading: false,
-            message: ""
-        };
+        }
+        this.inputPW = null;
+        this.inputUser = null;
+        this.handleLogin = this.handleLogin.bind(this);
     }
-
-    onChangeUsername(e: React.FormEvent<HTMLInputElement>) {
+    handleLogin() {
         this.setState({
-            username: e.currentTarget.value
-        });
-    }
-
-    onChangePassword(e: React.FormEvent<HTMLInputElement>) {
-        this.setState({
-            password: e.currentTarget.value
-        });
-    }
-
-    handleLogin(e: React.FormEvent<HTMLInputElement>) {
-        e.preventDefault();
-
-        this.setState({
-            message: "",
             loading: true
         });
+        const userName = this.inputUser?.value;
+        const inputPW = this.inputPW?.value;
+        AuthService.login(String(userName), String(inputPW)).then(
+            () => {
+                this.props.history.push("/");
+                window.location.reload();
+            },
+            error => {
+                const resMessage =
+                    (error.response &&
+                        error.response.data &&
+                        error.response.data.message) ||
+                    error.message ||
+                    error.toString();
 
-        // this.form.validateAll();
+                this.setState({
+                    loading: false,
+                    message: resMessage
+                });
+            }
+        );
 
-        if (this.checkBtn.context._errors.length === 0) {
-            AuthService.login(this.state.username, this.state.password).then(
-                () => {
-                    this.props.history.push("/profile");
-                    window.location.reload();
-                },
-                error => {
-                    const resMessage =
-                        (error.response &&
-                            error.response.data &&
-                            error.response.data.message) ||
-                        error.message ||
-                        error.toString();
 
-                    this.setState({
-                        loading: false,
-                        message: resMessage
-                    });
-                }
-            );
-        } else {
-            this.setState({
-                loading: false
-            });
-        }
     }
+    // onChangePassword= (e: SyntheticEvent)=>{
+    //     // const value = e.target.values
+    //     e.preventDefault();
 
+    //     console.log(e.target)
+    // }
     render() {
+        console.log(this.state.message)
         return (
-            <div className="col-md-12">
-                <div className="card card-container">
-                    <img
-                        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                        alt="profile-img"
-                        className="profile-img-card"
-                    />
-
-                    <Form
-                        onSubmit={this.handleLogin}
-                        ref={this.form}
-                    >
-                        <div className="form-group">
-                            <label htmlFor="username">Username</label>
-                            <Input
-                                type="text"
-                                className="form-control"
-                                name="username"
-                                value={this.state.username}
-                                onChange={this.onChangeUsername}
-                                validations={[required]}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="password">Password</label>
-                            <Input
-                                type="password"
-                                className="form-control"
-                                name="password"
-                                value={this.state.password}
-                                onChange={this.onChangePassword}
-                                validations={[required]}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <button
-                                className="btn btn-primary btn-block"
-                                disabled={this.state.loading}
-                            >
-                                {this.state.loading && (
-                                    <span className="spinner-border spinner-border-sm"></span>
-                                )}
-                                <span>Login</span>
-                            </button>
-                        </div>
-
-                        {this.state.message && (
-                            <div className="form-group">
-                                <div className="alert alert-danger" role="alert">
-                                    {this.state.message}
-                                </div>
-                            </div>
-                        )}
-                        <CheckButton
-                            style={{ display: "none" }}
-                            ref={this.checkBtn}
-                        />
-                    </Form>
+            <div className="auth-inner">
+                {this.state.message && (
+              <div className="form-group">
+                <div className="alert alert-danger" role="alert">
+                  {this.state.message}
                 </div>
+              </div>
+            )}
+                {!this.state.loading ? <form >
+                    <h3>Sign In</h3>
+
+                    <div className="form-group">
+                        <label>Username</label>
+                        <input type="text" className="form-control" placeholder="Enter username" ref={(n) => this.inputUser = n} />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input type="password" className="form-control" placeholder="Enter password" ref={(n) => this.inputPW = n} />
+                    </div>
+
+                    <div className="form-group">
+                        <div className="custom-control custom-checkbox">
+                            <input type="checkbox" className="custom-control-input" id="customCheck1" />
+                            <label className="custom-control-label" htmlFor="customCheck1">Remember me</label>
+                        </div>
+                    </div>
+
+                    <button type="button" className="btn btn-primary" onClick={this.handleLogin}>Submit</button>
+                    <p className="forgot-password text-right">
+                        Forgot <a href="#">password?</a>
+                    </p>
+                </form> : <></>}
             </div>
         );
     }
 }
+export default withRouter(Login)
