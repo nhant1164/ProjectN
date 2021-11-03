@@ -29,7 +29,7 @@
     "react-validation": "^3.0.7",
     "typescript": "^3.7.5",
     "validate.js": "^0.13.1",
-    "validator": "^13.0.0",
+    "validator": "^13.7.0",
     "yup": "^0.29.1"
   },
   "scripts": {
